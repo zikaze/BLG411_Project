@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+
+
+    <head>
+
+        <title>SCRUM</title>
+
+        <style>
+            [v-cloak]{
+                display:none
+            }
+        </style>
+
+    </head>
+
+
+
+
+
+    <body>
+
+        <h1>Welcome to Scrum Game!</h1>
+        
+
+        <div id="mainpage" v-cloak>
+            
+            <button onclick="document.location='tutorial1.html'">Create a Room</button>
+
+        </div>
+
+        <script src="https://unpkg.com/vue@next"></script>
+        <script>
+            let app = Vue.createApp({
+                data: function(){
+                    return{
+                    }
+                }
+            })
+            app.mount('#mainpage')
+        </script>
+
+    </body>
+
+
+
+
+
+</html>

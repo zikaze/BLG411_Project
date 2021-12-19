@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>SCRUM</title>
+
+        <style>
+            #content { width: 1500px; height: 600px; border: 1px solid black; position: relative; }
+            .topright { position: absolute; top: 5px; right: 5px; text-align: right; }
+            .bottomright { position: absolute; bottom: 5px; right: 5px; text-align: right; }
+            .topright { position: absolute; top: 5px; right: 5px; text-align: center; }
+          </style>
+
+    </head>
+
+    <body>
+
+        <div id="app">
+
+        
+            <div id="content">
+                <div class="topright">
+                    <h1>Waiting Room</h1>
+                </div>
+                <div class="bottomright">
+                    <h5>List of the players:</h5>    
+                <ol>
+                 <li>Scrum Master</li>
+                 <li v-if="player0">Player</li>
+                 <li v-if="player1">Player</li>
+                 <li v-if="player2">Player</li>
+                 <li v-if="player3">Player</li>
+                 <li v-if="player4">Player</li>
+                 <li v-if="player5">Player</li>
+                 <li v-if="player6">Player</li>
+                 <li v-if="player7">Player</li>               
+                  </ol>
+                </div>
+                <p>Your roomkey is: <br/> 123456789 </p>
+
+
+                <div class ="center">
+                    <button>Start Game</button>
+                </div>
+
+              </div>
+
+        </div>
+
+        <script src="https://unpkg.com/vue@next"></script>
+        <script>
+            let app = Vue.createApp({
+                data: function(){
+                    return{
+                        player0:true,
+                        player1:true,
+                        player2:true,
+                        player3:true,
+                        player4:true,
+                        player5:true,
+                        player6:true,
+                        player7:true,
+                    }
+                },
+                method: {
+                }
+            })
+            app.mount('#app')
+        </script>
+    </body>
+
+</html>

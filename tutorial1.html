@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+
+
+    <head>
+
+        <title>tutorial</title>
+
+        <style>
+            #content { width: 1500px; height: 600px; border: 1px solid black; position: relative; }
+            .bottomright { position: absolute; bottom: 5px; right: 5px; text-align: right; }
+            .bottomleft { position: absolute; bottom: 5px; left: 5px; text-align: left; }
+            [v-cloak]{
+                display:none
+            }
+        </style>
+
+    </head>
+
+
+
+
+
+    <body>
+        <div id="app" v-cloak >
+
+            <h1>Welcome to Scrum Game!</h1>
+            <div id="content">
+
+                <div v-if = "tutorial1">
+                
+                        <div class="bottomright">
+                            <button @click="tutorial1 = !tutorial1, tutorial2 = !tutorial2">next</button>
+                         <!--   <button @click="tutorial1 = !tutorial1, tutorial2 = !tutorial2">next</button> -->
+                        </div>
+                        <p>This game aims to teach Scrum and Cynefin frameworks and make players have fun at the same time
+                            <h3>Scrum:</h3>
+                            This is an Agile framework, which bla bla bla   </br>
+                            in the other hand bla bla bla
+                            <h3>Cynefin</h3>
+                            What up lads. Having fun? bla bla blaaa
+                        </p>
+                
+                </div>
+
+
+                <div v-if = "tutorial2">
+
+                    <div class="bottomleft">
+                        <button @click="tutorial1 = !tutorial1, tutorial2 = !tutorial2">back</button>
+                    </div>
+
+                    <div class="bottomright">
+                        <button onclick="document.location='lobi.html'">next</button>
+                    </div>
+                    
+                    <p>kjdbvbfjvbpiF;SDLJVBKkljsxcfvbnjiyrcvbnbvctucvinivcyucvdjcnosvyvcb
+                        ;jsdbfjbsdaoigbpifbiboubdvosjbodfhaogfoiaofoabfobaifbidabjdbbj
+                        text text text text
+                        wowieee wowieeeeee bla bla
+                        <h4>We wish you Good Luck!</h4>
+                    </p>
+                    
+                </div>
+            </div>
+
+
+        </div>
+
+        <script src="https://unpkg.com/vue@next"></script>
+        <script>
+            let app = Vue.createApp({
+                data: function(){
+                    return{
+                        tutorial1 : true,
+                        tutorial2 : false
+                    }
+                },
+                method: {
+                    
+                }
+            })
+            app.mount('#app')
+        </script>
+
+
+
+    </body>
+
+
+
+
+
+</html>
