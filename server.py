@@ -9,6 +9,11 @@ from jinja2 import Environment as JnEnv, FileSystemLoader as JnFileSystemLoader,
 
 
 class GameOperation(BaseModel):
+    """
+    A specific action taken by a user within the game. Putting one of their Tokens on a Task for example
+
+    Used in GameRequest.
+    """
     target_tick : int   # the tick this request is scheduled to take place in.
     operation : str     # the operation or command to call
     args : Dict         # arguments for the operation
@@ -29,24 +34,47 @@ class GameOperation(BaseModel):
 # |     |                       |
 
 class GameRequest(BaseModel):
+    """
+    Encapsulates a GameRequest. These Requests consist of GameOperations which most be done atomically.
+    """
     user_id : int
-    user_passcode : Optional[int] = None
+    user_authcode : Optional[int] = None
     request_id : int
     operations : Optional[List[GameOperation]] = None
 
 
 class GameUpdate(BaseModel):
+    """
+    Sent by the Game to users to inform them of newly approved GameRequests, and if this decision
+    invalidates any of the previously approved GRequests.
+    """
     new : Optional[List[GameRequest]] = []
     invalidates : Optional[List[GameRequest]] = []
 
 
 class User:
-    user_id : int
-    username : str
-    user_passcode : int
+    """
+    A User. Has an id, username, and a randomly assigned authcode.
+    """
+    def __init__(self, user_id : int, username : str, authcode : int):
+        self.user_id = user_id
+        self.name = username
+        self.authcode = useauthcode
 
 class Task:
-    pass
+    """
+    A in-game Task.
+    """
+    class TaskType(Enum):
+        SIMPLE = 1
+        COMPLICATED = 2
+        COMPLEX = 3
+        CHAOTIC = 4
+
+    def __init__(self, task_type: Type, length : int):
+        self.task_type = task_type
+        self.length = length
+
 
 class Game:
     users : List[User]
@@ -159,7 +187,7 @@ def join_game(room_id : int):
 def get_game(room_id:int):
     """
     Returns the page with all the game stuff on it.
-    user_id, user_passcode and room_id will be integrated into the page with a Jinja template.
+    user_id, user_authcode and room_id will be integrated into the page with a Jinja template.
 
     After being received, the page must connect to /game_ws/{room_id}/{user_id} to send and 
     receive game requests.
@@ -171,7 +199,7 @@ def get_game(room_id:int):
 def game_ws(room_id:int , user_id:int):
     """
     The websocket for user-game pair. Game requests come and leave from here. All game requests
-    must be sent with a user_passcode to validate that it is infact the user who sent the request.
+    must be sent with a user_authcode to validate that it is infact the user who sent the request.
 
     It basically is a middle man between the users and Game.make_request()
     """
