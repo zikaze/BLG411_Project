@@ -128,7 +128,7 @@ def get_homepage():
     """
     return jinja_env.get_template(name='index.html').render()
 
-@app.get('/tutorial')
+@app.get('/tutorial', response_class=HTMLResponse)
 def get_tutorial():
     """
     Returns the tutorial page.
