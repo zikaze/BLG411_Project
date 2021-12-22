@@ -77,7 +77,7 @@ class Game:
     def __init__(self):
         self.users = list[User]
         self.req_backlog = list[Task]
-        self.spr_backlog = List[Task]
+        self.spr_backlog = list[Task]
         self.game_phase = int
         self.sprint_count = int
 
