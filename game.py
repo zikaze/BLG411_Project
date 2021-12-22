@@ -74,11 +74,12 @@ class Task:
 
 
 class Game:
-    users : List[User]
-    req_backlog : List[Task]
-    spr_backlog : List[Task]
-    game_phase : int
-    sprint_count : int
+    def __init__(self):
+        self.users = list[User]
+        self.req_backlog = list[Task]
+        self.spr_backlog = List[Task]
+        self.game_phase = int
+        self.sprint_count = int
 
     def make_request(self, request : GameRequest) -> GameUpdate:
         """
