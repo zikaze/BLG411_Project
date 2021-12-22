@@ -1,5 +1,6 @@
 import os
 import heapq
+import enum
 
 from typing import List, Tuple, Dict, Optional
 from fastapi import FastAPI
@@ -59,13 +60,14 @@ class User:
     def __init__(self, user_id : int, username : str, authcode : int):
         self.user_id = user_id
         self.name = username
-        self.authcode = useauthcode
+        self.authcode = authcode
 
 class Task:
     """
     A in-game Task.
     """
-    class TaskType(Enum):
+    @enum.unique
+    class Type(enum.IntEnum):
         SIMPLE = 1
         COMPLICATED = 2
         COMPLEX = 3
