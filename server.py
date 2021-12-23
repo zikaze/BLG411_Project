@@ -13,6 +13,8 @@ jinja_env = JnEnv(
                     loader=JnFileSystemLoader(f'{os.path.dirname(__file__)}/templates/'), 
                     autoescape=select_autoescape('html')
                  )
+GameList = GameList()
+
 
 @app.get('/', response_class=HTMLResponse)
 def get_homepage():
@@ -37,7 +39,10 @@ def create_game():
     """
     Creates a new Game object, then redirects user to /join/{room_id}.
     """
-    pass
+    Game1 = Game()
+    index = GameList.insert_game(Game1)
+
+    return f'/join/{index}'
 
 
 @app.get('/join/{room_id}')
