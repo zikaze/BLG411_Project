@@ -74,12 +74,31 @@ class Task:
 
 
 class Game:
+    """
+    Represents a Game instance. GameRequests go in, game state updates, GameUpdates come out.
+    """
+    class Phase(enum.IntEnum):
+        """
+        Represents current phase of the game.
+        WAITING indicates game hasn't yet started.
+        Rest are directly from the game specs.
+        """
+        WAITING = 0
+        PLANNING = 1
+        SPRINT = 2
+        RETROSPECTIVE = 3
     def __init__(self):
-        self.users = list[User]
-        self.req_backlog = list[Task]
-        self.spr_backlog = list[Task]
-        self.game_phase = int
-        self.sprint_count = int
+        self.users : dict[int, User] = {}
+        self.req_backlog : list[Task] = []
+        self.spr_backlog : list[Task] = []
+        self.game_phase : Game.Phase = Game.Phase.WAITING
+        self.sprint_count : int = 0
+
+    def add_user(self, user : User) -> None:
+        """
+        Registers a user to a game
+        """
+        self.users[user.user_id] = user
 
     def make_request(self, request : GameRequest) -> GameUpdate:
         """
