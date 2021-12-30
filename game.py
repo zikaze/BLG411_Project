@@ -4,16 +4,17 @@ from typing import List, Tuple, Dict, Optional
 
 from pydantic import BaseModel
 
-class GameOperation(BaseModel):
-    """
-    A specific action taken by a user within the game. Putting one of their Tokens on a Task for example
 
-    Used in GameRequest.
+class GameRequest(BaseModel):
     """
+    Encapsulates a GameRequest. These Requests consist of GameOperations which most be done atomically.
+    """
+    user_id : int
+    user_authcode : Optional[int] = None
+    request_id : int
     target_tick : int   # the tick this request is scheduled to take place in.
     operation : str     # the operation or command to call
-    args : Dict         # arguments for the operation
-
+    operation_args : Dict         # arguments for the operation
 # Note on target_ids: All user-alterable things in a game (ie. the Tasks, Chatbox, Noteboard) 
 # have a unique id assigned to them, and these ids are used in commands when referencing them.
 # Tasks start at id 1000. Everything else gets a constant predetermined value.
@@ -28,15 +29,6 @@ class GameOperation(BaseModel):
 # |     |                       |
 # |     |                       |
 # |     |                       |
-
-class GameRequest(BaseModel):
-    """
-    Encapsulates a GameRequest. These Requests consist of GameOperations which most be done atomically.
-    """
-    user_id : int
-    user_authcode : Optional[int] = None
-    request_id : int
-    operations : Optional[List[GameOperation]] = None
 
 
 class GameUpdate(BaseModel):
@@ -57,9 +49,17 @@ class User:
         self.name = username
         self.authcode = authcode
 
-class Task:
+
+class GameObject:
     """
-    A in-game Task.
+    Represents a in-game object. 
+    """
+    def __init__(self, object_id):
+        self.object_id : int = object_id
+
+class Task(GameObject):
+    """
+    Represents a in-game Task.
     """
     @enum.unique
     class Type(enum.IntEnum):
@@ -71,6 +71,17 @@ class Task:
     def __init__(self, task_type: Type, length : int):
         self.task_type = task_type
         self.length = length
+
+class GameState:
+    """
+    Represent the state of a Game for a single frame.
+
+    depends_on holds the ids of GameObjects this State depends on. If any of these objects are 
+    proposed for a change before this State, this object must be re-rendered.
+    """
+    def __init__(self):
+        self.objects = dict[int, GameObject]
+        self.depends_on = set(int)
 
 
 class Game:
@@ -87,12 +98,14 @@ class Game:
         PLANNING = 1
         SPRINT = 2
         RETROSPECTIVE = 3
+
     def __init__(self):
         self.users : dict[int, User] = {}
         self.req_backlog : list[Task] = []
         self.spr_backlog : list[Task] = []
         self.game_phase : Game.Phase = Game.Phase.WAITING
         self.sprint_count : int = 0
+        self.future_states : dict[int, GameState]
 
     def add_user(self, user : User) -> None:
         """
@@ -104,6 +117,10 @@ class Game:
         """
         Applies changes given in GameRequest. Returns a GameUpdate that should be sent out to users.
         """
+        # FIXME This is absolute trash
+        times = sorted(future_states.keys())
+
+
         pass
 
 class GameList:
