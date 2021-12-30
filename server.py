@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, RedirectResponse
 from jinja2 import Environment as JnEnv, FileSystemLoader as JnFileSystemLoader, select_autoescape
-
+import random
 from game import *
 
 
@@ -52,8 +52,16 @@ def join_game(room_id : int):
 
     If game does not exist, redirects to /?invalidroom=1
     """
-
-    pass
+    id = random.randint(9, 1000000000)
+    while GameList.games[room_id].users[id] == None:
+        id = random.randint(9,1000000000)
+    user1 = User()
+    user1.id = id
+    user1.name = 'Player{}'.format(len(GameList.games[room_id].users)+1)
+    user1.authcode = random.randint(1000000,9999999)
+    GameList.games[room_id].add_user(user1)
+    if(GameList.games[room_id] != None):
+        return RedirectResponse(url=app.url_path_for("get_homepage",room_id_valid = 0))
 
 
 @app.get('/game/{room_id}', response_class=HTMLResponse)
