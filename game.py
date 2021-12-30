@@ -98,7 +98,9 @@ class Game:
         """
         Registers a user to a game
         """
+
         self.users[user.user_id] = user
+
 
     def make_request(self, request : GameRequest) -> GameUpdate:
         """
