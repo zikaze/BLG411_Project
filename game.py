@@ -128,7 +128,7 @@ class GameList:
             index = len(self.games)
             self.largest_index_in_use = index
 
-        self.games[index] = game
+        self.games.insert(index, game)
         return index
 
     def free_game(self, index : int) -> None:

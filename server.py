@@ -1,7 +1,7 @@
 import os
 
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from jinja2 import Environment as JnEnv, FileSystemLoader as JnFileSystemLoader, select_autoescape
 
 from game import *
@@ -34,7 +34,7 @@ def get_tutorial():
     return jinja_env.get_template(name='tutorial1.html').render()
 
 
-@app.get('/create_game')
+@app.get('/create_game', response_class=RedirectResponse)
 def create_game():
     """
     Creates a new Game object, then redirects user to /join/{room_id}.
@@ -42,7 +42,7 @@ def create_game():
     game1 = Game()
     index = GameList.insert_game(game1)
 
-    return f'/join/{index}'
+    return RedirectResponse(url=app.url_path_for("join_game",room_id=index))
 
 
 @app.get('/join/{room_id}')
