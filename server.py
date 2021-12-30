@@ -10,7 +10,7 @@ from game import *
 app = FastAPI()
 
 jinja_env = JnEnv(
-                    loader=JnFileSystemLoader(f'{os.path.dirname(__file__)}/templates/'), 
+                    loader=JnFileSystemLoader(f'{os.path.dirname(__file__)}/templates/'),
                     autoescape=select_autoescape('html')
                  )
 GameList = GameList()
@@ -39,8 +39,8 @@ def create_game():
     """
     Creates a new Game object, then redirects user to /join/{room_id}.
     """
-    Game1 = Game()
-    index = GameList.insert_game(Game1)
+    game1 = Game()
+    index = GameList.insert_game(game1)
 
     return f'/join/{index}'
 
