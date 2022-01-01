@@ -13,6 +13,7 @@ class GameRequest(BaseModel):
     user_authcode : Optional[int] = None
     request_id : int
     target_tick : int   # the tick this request is scheduled to take place in.
+    operation_target : Optional[int] = None
     operation : str     # the operation or command to call
     operation_args : Dict         # arguments for the operation
 # Note on target_ids: All user-alterable things in a game (ie. the Tasks, Chatbox, Noteboard) 
