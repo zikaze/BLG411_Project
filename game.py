@@ -1,13 +1,15 @@
 import heapq
 import enum
 from typing import List, Tuple, Dict, Optional
+from copy import deepcopy
 
 from pydantic import BaseModel
 
 
 class GameRequest(BaseModel):
     """
-    Encapsulates a GameRequest. These Requests consist of GameOperations which most be done atomically.
+    Encapsulates a GameRequest. These Requests consist of GameOperations which most be done 
+    atomically.
     """
     user_id : int
     user_authcode : Optional[int] = None
@@ -16,6 +18,7 @@ class GameRequest(BaseModel):
     operation_target : Optional[int] = None
     operation : str     # the operation or command to call
     operation_args : Dict         # arguments for the operation
+        
 # Note on target_ids: All user-alterable things in a game (ie. the Tasks, Chatbox, Noteboard) 
 # have a unique id assigned to them, and these ids are used in commands when referencing them.
 # Tasks start at id 1000. Everything else gets a constant predetermined value.
@@ -45,6 +48,13 @@ class User:
     """
     A User. Has an id, username, and a randomly assigned authcode.
     """
+    class Role(enum.IntEnum):
+        """
+        Represents a User's in-game role.
+        """
+        USER = 1
+        LEADER = 2
+
     def __init__(self, user_id : int, username : str, authcode : int):
         self.user_id = user_id
         self.name = username
@@ -53,10 +63,16 @@ class User:
 
 class GameObject:
     """
-    Represents a in-game object. 
+    Represents a in-game object.
+
+    self.operations hold all available in-game operations.
+    The signature for an operation should be (self, state: GameState, request : GameRequest) -> GameState
+    It returns either the next GameState or None if operation violates in-game rules.
     """
     def __init__(self, object_id):
         self.object_id : int = object_id
+        self.operations : dict [str, type(self.__init__)] = {}
+
 
 class Task(GameObject):
     """
@@ -64,25 +80,36 @@ class Task(GameObject):
     """
     @enum.unique
     class Type(enum.IntEnum):
+        """
+        In-game Task Type.
+        """
         SIMPLE = 1
         COMPLICATED = 2
         COMPLEX = 3
         CHAOTIC = 4
 
-    def __init__(self, task_type: Type, length : int):
+    def __init__(self, object_id : int,  task_type: Type, length : int):
+        super().__init__(object_id)
         self.task_type = task_type
         self.length = length
 
-class GameState:
-    """
-    Represent the state of a Game for a single frame.
+    def _gop_add_token(self, state:Game.State, request: GameRequest)-> Game.State or None:
+        """
+        Adds a user's token to this task.
+        """
+        if state.users[request.user_id].free_tokens == 0:
+            return None
 
-    depends_on holds the ids of GameObjects this State depends on. If any of these objects are 
-    proposed for a change before this State, this object must be re-rendered.
-    """
-    def __init__(self):
-        self.objects = dict[int, GameObject]
-        self.depends_on = set(int)
+        target = state.objects[request.target_id]
+        if not isinstance(target, Task):
+            raise ValueError("Given target_id doesnt belong to a task.")
+        if target.current_tokens == target.max_tokens:
+            return None
+
+        new_state = deepcopy(state)
+        target = new_state.objects[request.target_id]
+        target.cur_tokens =target.cur_token + 1
+        return new_state
 
 
 class Game:
@@ -100,38 +127,113 @@ class Game:
         SPRINT = 2
         RETROSPECTIVE = 3
 
+
+    class State:
+        """
+        Represents the state of the game at a given tick.
+
+        These go in between StateChanges so we don't need to rerender everything each time a
+        request is made.
+        """
+        def __init__(self):
+            self.objects : dict[int, GameObject] = {}
+            self.req_backlog : list[Task] = []
+            self.spr_backlog : list[Task] = []
+            self.game_phase : Game.Phase = Game.Phase.WAITING
+            self.sprint_count : int = 0
+            self.users : dict[int, User] = {}
+
     def __init__(self):
-        self.users : dict[int, User] = {}
-        self.req_backlog : list[Task] = []
-        self.spr_backlog : list[Task] = []
-        self.game_phase : Game.Phase = Game.Phase.WAITING
-        self.sprint_count : int = 0
-        self.future_states : dict[int, GameState]
+        self.requests : dict[int, list[GameRequest]]
+        self.state = Game.State()
 
     def add_user(self, user : User) -> None:
         """
         Registers a user to a game
         """
 
-        self.users[user.user_id] = user
+        self.state.users[user.user_id] = user
 
 
     def make_request(self, request : GameRequest) -> GameUpdate:
         """
         Applies changes given in GameRequest. Returns a GameUpdate that should be sent out to users.
         """
+        # Fuck it: just apply every request everytime a new request is made.
         # FIXME This is absolute trash
-        times = sorted(future_states.keys())
+        result = GameUpdate()
+        current_state = deepcopy(self.state)
+        times = sorted(self.requests.keys())
+        time_i = 0
+        times_len = len(times)
+
+        while (time_i < times_len) and (times[time_i] > request.target_tick):
+            time = times[time_i]
+            if time > request.target_tick:
+                break
+            
+            for req in self.requests[time]:
+                current_state = self._apply_request(current_state, req)
+            # TODO Assert nonnull value
+
+            time_i = time_i + 1
+
+        current_state = self._apply_request(current_state, request)
+
+        if current_state :
+            result.new.append(request)
+        else:
+            # The change is not applicable.
+            result.invalidates.append(request)
+            return result
+
+        # Continue applying requests. Anything that violates rules goes in the invalidate pile.
+        while time_i < times_len :
+            for req in self.requests[time_i]:
+                proposed_state = self._apply_request(current_state, req)
+                if proposed_state:
+                    current_state = proposed_state
+                else:
+                    result.invalidates.append(req)
+
+            time_i = time_i + 1
+
+        return result
 
 
-        pass
+
+    def _apply_request(self, state: Game.State, request : GameRequest) -> Game.State:
+        """
+        Apply the Request to this State, return the resulting State. If the request violates any
+        in-game rules, None will be returned.
+        """
+        # 1. If there is a target_id, you arent supposed to handle this. Call target's operation
+        #   instead.
+        if request.target_id:
+            game_obj = state.objects[request.target_id]
+            return game_obj.operations[request.operation](state, request)
+        
+        # 2. If its an operation concerning the game itself then it should be handled here
+        # ==== GameOperations concerning the game itself start here ====
+
+        # Operation start_game: starts the game.
+        if request.operation == "start_game":
+            if state.users[request.user_id].role == User.Role.LEADER:
+                new_state = deepcopy(state)
+                new_state.game_phase = Game.Phase.PLANNING
+                return new_state
+            return None
+
+        # TODO Operation: add_user
+        # TODO Operation: end_game
+        # TODO Probably more Operations
 
 class GameList:
     """
     Contains a list of Games associated with the server.
     """
     def __init__(self):
-        self.games = []
+        self.games = [ ]
         self.free_indexes = [] # A heap containing previously freed indexes.
         self.largest_index_in_use = 0
 
