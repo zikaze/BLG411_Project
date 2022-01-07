@@ -86,3 +86,10 @@ def game_ws(room_id:int , user_id:int):
     """
     pass
 
+@app.get('/lobby', response_class=HTMLResponse)
+def get_lobby():
+    """
+    Returns the lobby page.
+
+    """
+    return jinja_env.get_template(name='lobby.html').render()
