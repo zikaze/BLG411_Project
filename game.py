@@ -74,43 +74,6 @@ class GameObject:
         self.operations : dict [str, type(self.__init__)] = {}
 
 
-class Task(GameObject):
-    """
-    Represents a in-game Task.
-    """
-    @enum.unique
-    class Type(enum.IntEnum):
-        """
-        In-game Task Type.
-        """
-        SIMPLE = 1
-        COMPLICATED = 2
-        COMPLEX = 3
-        CHAOTIC = 4
-
-    def __init__(self, object_id : int,  task_type: Type, length : int):
-        super().__init__(object_id)
-        self.task_type = task_type
-        self.length = length
-
-    def _gop_add_token(self, state:Game.State, request: GameRequest)-> Game.State or None:
-        """
-        Adds a user's token to this task.
-        """
-        if state.users[request.user_id].free_tokens == 0:
-            return None
-
-        target = state.objects[request.target_id]
-        if not isinstance(target, Task):
-            raise ValueError("Given target_id doesnt belong to a task.")
-        if target.current_tokens == target.max_tokens:
-            return None
-
-        new_state = deepcopy(state)
-        target = new_state.objects[request.target_id]
-        target.cur_tokens =target.cur_token + 1
-        return new_state
-
 
 class Game:
     """
@@ -202,7 +165,7 @@ class Game:
 
 
 
-    def _apply_request(self, state: Game.State, request : GameRequest) -> Game.State:
+    def _apply_request(self, state: State, request : GameRequest) -> State:
         """
         Apply the Request to this State, return the resulting State. If the request violates any
         in-game rules, None will be returned.
@@ -227,6 +190,43 @@ class Game:
         # TODO Operation: add_user
         # TODO Operation: end_game
         # TODO Probably more Operations
+
+class Task(GameObject):
+    """
+    Represents a in-game Task.
+    """
+    @enum.unique
+    class Type(enum.IntEnum):
+        """
+        In-game Task Type.
+        """
+        SIMPLE = 1
+        COMPLICATED = 2
+        COMPLEX = 3
+        CHAOTIC = 4
+
+    def __init__(self, object_id : int,  task_type: Type, length : int):
+        super().__init__(object_id)
+        self.task_type = task_type
+        self.length = length
+
+    def _gop_add_token(self, state:Game.State, request: GameRequest)-> Game.State or None:
+        """
+        Adds a user's token to this task.
+        """
+        if state.users[request.user_id].free_tokens == 0:
+            return None
+
+        target = state.objects[request.target_id]
+        if not isinstance(target, Task):
+            raise ValueError("Given target_id doesnt belong to a task.")
+        if target.current_tokens == target.max_tokens:
+            return None
+
+        new_state = deepcopy(state)
+        target = new_state.objects[request.target_id]
+        target.cur_tokens =target.cur_token + 1
+        return new_state
 
 class GameList:
     """
