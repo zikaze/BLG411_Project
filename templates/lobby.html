@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>SCRUM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Architects+Daughter|Roboto&;subset=latin,devanagari">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+    <style>
+        #content {
+            width: 1400px;
+            height: 620px;
+            border: 1px solid black;
+            position: relative;
+            margin: 10px;
+            margin-left: 20px;
+        }
+
+        .topright {
+            position: absolute;
+            top: 5px;
+            left: 33%;
+            text-align: center;
+        }
+
+        .bottomcenter {
+            position: absolute;
+            top: 77%;
+            right: 38%;
+            text-align: right;
+        }
+
+        .bottomleft {
+            position: absolute;
+            top: 40%;
+            right: 82%;
+            text-align: center;
+        }
+
+        body {
+            background: #512da8;
+            overflow: hidden;
+            animation-name: example;
+            animation-duration: 4s;
+        }
+
+        h1 {
+            font-family: "Architects Daughter", cursive;
+            text-transform: uppercase;
+            font-weight: 900;
+        }
+
+        @keyframes example {
+            from {
+                opacity: 0;
+                ;
+            }
+
+            to {
+                opacity: 1;
+                ;
+            }
+        }
+    </style>
+
+</head>
+
+<body id="body">
+    <header class="navbar-fixed">
+        <nav class="row deep-purple darken-3">
+            <div class="col s12">
+                <ul class="right">
+                    <li class="right">
+                        <a href="https://github.com/zikaze/BLG411_Project" target="_blank"
+                            class="fa fa-github-square fa-2x waves-effect waves-light"><span
+                                class="icon-text"></span></a>
+                    </li>
+                    <li style="position: absolute;right: 500px;top:-30px;">
+                        <h1>Waiting Room</h1>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <div id="app">
+
+
+        <div id="content">
+            <div class="topright">
+
+            </div>
+
+            <p class="flow-text" style="font-size: 40px;color: white;position: absolute;top: 25%;left:1% ;">List of the
+                players:</p>
+            <div class="bottomleft" style="color: white;">
+                <ol class="flow-text">
+                    <li>Scrum Master</li>
+                    <li v-if="player0">Player</li>
+                    <li v-if="player1">Player</li>
+                    <li v-if="player2">Player</li>
+                    <li v-if="player3">Player</li>
+                    <li v-if="player4">Player</li>
+                    <li v-if="player5">Player</li>
+                    <li v-if="player6">Player</li>
+                    <li v-if="player7">Player</li>
+                </ol>
+            </div>
+            <div class="bottomcenter">
+                <p class="flow-text" style="color: white;">Your roomkey is: 123456789 </p>
+                <div onclick="myFunction()">
+                <a class="btn" style="position: relative;right: 14%;" v-cloak>Copy to Clipboard</a>
+            </div>
+            </div>
+            <div>
+                <a class="btn" href='tutorial' style="position:absolute; top: 91%; right: 2%;">Learn the basics</a>
+                <a class="btn" href='' style="position:absolute; top: 84%; right: 2%;"> Start the Game</a>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="https://unpkg.com/vue@next"></script>
+    <script>
+        let app = Vue.createApp({
+            data: function () {
+                return {
+                    player0: true,
+                    player1: true,
+                    player2: true,
+                    player3: true,
+                    player4: true,
+                    player5: true,
+                    player6: true,
+                    player7: true,
+                }
+            },
+            method: {
+            }
+        })
+        app.mount('#app')
+    </script>
+    <script>
+        function myFunction() {
+            var copyText = "123456789";
+
+            navigator.clipboard.writeText(copyText);
+
+            alert("Copied!");
+        }
+    </script>
+</body>
+
+</html>
