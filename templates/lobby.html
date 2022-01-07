@@ -109,13 +109,13 @@
                 </ol>
             </div>
             <div class="bottomcenter">
-                <p class="flow-text" style="color: white;">Your roomkey is: 123456789 </p>
+                <p class="flow-text" style="color: white;">Your roomkey is: room_id </p> <!--{{room_id}} -->
                 <div onclick="myFunction()">
                 <a class="btn" style="position: relative;right: 14%;" v-cloak>Copy to Clipboard</a>
             </div>
             </div>
             <div>
-                <a class="btn" href='tutorial' style="position:absolute; top: 91%; right: 2%;">Learn the basics</a>
+                <a class="btn" href='../tutorial' style="position:absolute; top: 91%; right: 2%;">Learn the basics</a>
                 <a class="btn" href='' style="position:absolute; top: 84%; right: 2%;"> Start the Game</a>
             </div>
 
@@ -145,7 +145,8 @@
     </script>
     <script>
         function myFunction() {
-            var copyText = "123456789";
+            
+            var copyText = "room_id";
 
             navigator.clipboard.writeText(copyText);
 

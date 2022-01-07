@@ -53,15 +53,11 @@ def join_game(room_id : int):
     If game does not exist, redirects to /?invalidroom=1
     """
     id = random.randint(9, 1000000000)
-    while GameList.games[room_id].users[id] == None:
+    while id in GameList.games[room_id].state.users:
         id = random.randint(9,1000000000)
-    user1 = User()
-    user1.id = id
-    user1.name = 'Player{}'.format(len(GameList.games[room_id].users)+1)
-    user1.authcode = random.randint(1000000,9999999)
+    user1 = User(id,'Player{}'.format(len(GameList.games[room_id].state.users)+1),random.randint(1000000,9999999))
     GameList.games[room_id].add_user(user1)
-    if(GameList.games[room_id] != None):
-        return RedirectResponse(url=app.url_path_for("get_homepage",room_id_valid = 0))
+    return RedirectResponse(url=app.url_path_for("get_game", room_id=room_id))
 
 
 @app.get('/game/{room_id}', response_class=HTMLResponse)
@@ -73,7 +69,7 @@ def get_game(room_id:int):
     After being received, the page must connect to /game_ws/{room_id}/{user_id} to send and 
     receive game requests.
     """
-    pass
+    return jinja_env.get_template(name='lobby.html').render()
 
 
 @app.get('/game_ws/{room_id}/{user_id}')
@@ -85,11 +81,3 @@ def game_ws(room_id:int , user_id:int):
     It basically is a middle man between the users and Game.make_request()
     """
     pass
-
-@app.get('/lobby', response_class=HTMLResponse)
-def get_lobby():
-    """
-    Returns the lobby page.
-
-    """
-    return jinja_env.get_template(name='lobby.html').render()
